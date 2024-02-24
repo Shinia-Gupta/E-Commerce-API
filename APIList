@@ -1,0 +1,61 @@
+APIs for Products>> A
+
+> > Product Controller
+> > get all Products~
+> > get one Product~
+> > add Product~
+> > filter Products~
+
+When user is logged in> C
+rate Product
+add items to cart
+get items of cart
+remove items of cart
+
+APIs for Users>> B
+
+> > User Controller
+> > Signup-Email,name,password,type of user(customer,seller)~
+> > Signin-(email,password)~
+
+//mongosh operations
+
+> > for averageRatingInEachProduct()
+> > db.products.aggregate([
+
+{
+$unwind:"$ratings"
+},
+{
+$group:{_id:"name",averageRating:{$avg:"$ratings.rating"}}
+}
+]
+)
+
+> > for counting the number of ratings in nested ratings array of each product
+> > db.products.aggregate([
+
+    {
+        //Stage >> project the name and count of rating
+        $project:{name:1,countOfRating:{$cond:{if:{$isArray:"$ratings"},then:{$size:"$ratings"},else:0}}}
+    }
+
+])
+
+> > sort the products collection to show maximum ratings on the top
+ db.products.aggregate([
+
+    {
+        //Stage >> project the name and count of rating
+        $project:{name:1,countOfRating:{$cond:{if:{$isArray:"$ratings"},then:{$size:"$ratings"},else:0}}}
+    },
+    {
+        //Stage >>sort the products collection to show maximum ratings on the top
+
+        $sort:{countOfRating:-1}
+},
+{
+    //Stage >> limit to just one item in result
+    $limit:1
+}
+])
